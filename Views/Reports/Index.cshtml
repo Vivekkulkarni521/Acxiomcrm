@@ -1,0 +1,31 @@
+@model ACXIOMCRM.Models.ViewModels.ReportsViewModel
+@using System.Text.Json
+@{ ViewData["Title"] = "Reports"; }
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3"><div><h2 class="mb-1">Reports</h2><p class="text-muted mb-0">Database reports limited to records you can access.</p></div><div class="d-flex gap-2"><a asp-action="ExportCsv" asp-route-type="@Model.Type" asp-route-search="@Model.Search" asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")" asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">Export CSV</a><a asp-action="ExportPdf" asp-route-type="@Model.Type" asp-route-search="@Model.Search" asp-route-dateFrom="@Model.DateFrom?.ToString("yyyy-MM-dd")" asp-route-dateTo="@Model.DateTo?.ToString("yyyy-MM-dd")" class="btn btn-outline-danger">Export PDF</a></div></div>
+    <form asp-action="Index" method="get" class="card card-body shadow-sm border-0 mb-4"><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="row g-2 align-items-end">
+        <div class="col-12 col-md-4"><label for="type" class="form-label">Report</label><select id="type" name="type" class="form-select">@foreach (var option in Model.ReportOptions) { <option value="@option.Value" selected="@(option.Value == Model.Type)">@option.Label</option> }</select></div>
+        <div class="col-12 col-md-4"><label for="search" class="form-label">Search</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Search report records" /></div>
+        <div class="col-6 col-md-1"><label for="dateFrom" class="form-label">From</label><input id="dateFrom" type="date" name="dateFrom" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+        <div class="col-6 col-md-1"><label for="dateTo" class="form-label">To</label><input id="dateTo" type="date" name="dateTo" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+        <div class="col-12 col-md-2 d-flex gap-2"><button type="submit" class="btn btn-primary flex-grow-1">Run Report</button><a asp-action="Index" asp-route-type="@Model.Type" class="btn btn-outline-secondary">Clear</a></div>
+    </div></form>
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-end mb-3"><div><h3 class="h4 mb-1">@Model.Title</h3><span class="text-muted">@Model.TotalRows.ToString("N0") matching record(s)</span></div><small class="text-muted">Date filters use the report's record date; audit timestamps are UTC.</small></div>
+    <div class="row g-3 mb-4">@foreach (var kpi in Model.Kpis) { <div class="col-12 col-sm-6 col-xl-3"><div class="card shadow-sm border-0 p-3 h-100"><small class="text-muted">@kpi.Label</small><strong class="fs-3">@kpi.Value</strong></div></div> }</div>
+    <div class="card shadow-sm border-0 mb-4"><div class="card-header bg-white fw-semibold">Report summary</div><div class="card-body"><div style="height:320px"><canvas id="reportChart" aria-label="@Model.Title chart"></canvas></div></div></div>
+    <div class="card shadow-sm border-0"><div class="card-header bg-white fw-semibold">Report details</div><div class="card-body table-responsive"><table class="table table-striped table-hover align-middle mb-0"><thead class="table-dark"><tr>@foreach (var column in Model.Columns) { <th>@column.Header</th> }</tr></thead><tbody>
+    @if (Model.Rows.Count == 0) { <tr><td colspan="@Math.Max(1, Model.Columns.Count)" class="text-center text-muted py-4">No records match the selected filters.</td></tr> }
+    else { @foreach (var row in Model.Rows) { <tr>@foreach (var cell in row.Cells) { <td>@cell</td> }</tr> } }
+    </tbody></table></div></div>
+    @if (Model.TotalRows > Model.Rows.Count) { <p class="text-muted mt-2">Showing the first @Model.Rows.Count records. CSV and PDF exports include all matching rows.</p> }
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const reportLabels = @Html.Raw(JsonSerializer.Serialize(Model.ChartLabels));
+    const reportValues = @Html.Raw(JsonSerializer.Serialize(Model.ChartValues));
+    new Chart(document.getElementById('reportChart'), {
+        type: '@Model.ChartType',
+        data: { labels: reportLabels, datasets: [{ label: '@Model.Title', data: reportValues, backgroundColor: ['#0d6efd','#20c997','#ffc107','#dc3545','#6f42c1','#fd7e14','#0dcaf0','#6c757d'], borderWidth: 1 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, display: '@Model.ChartType' === 'bar' } } }
+    });
+</script>

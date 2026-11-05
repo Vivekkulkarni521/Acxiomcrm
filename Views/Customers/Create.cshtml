@@ -1,0 +1,64 @@
+
+@model ACXIOMCRM.Models.Customer
+
+@{
+    ViewData["Title"] = "Add Customer";
+}
+
+<div class="container py-4">
+    <h2>Add New Customer</h2>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Company" class="form-label"></label>
+            <input asp-for="Company" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <textarea asp-for="Address" class="form-control"></textarea>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4"><label asp-for="City" class="form-label"></label><input asp-for="City" class="form-control" /><span asp-validation-for="City" class="text-danger"></span></div>
+            <div class="col-md-4"><label asp-for="State" class="form-label"></label><input asp-for="State" class="form-control" /><span asp-validation-for="State" class="text-danger"></span></div>
+            <div class="col-md-4"><label asp-for="Country" class="form-label"></label><input asp-for="Country" class="form-control" /><span asp-validation-for="Country" class="text-danger"></span></div>
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="mb-3">
+                <label asp-for="AssignedToUserId" class="form-label">Assign to</label>
+                <select asp-for="AssignedToUserId" asp-items="ViewBag.Assignees" class="form-select">
+                    <option value="">Unassigned</option>
+                </select>
+                <span asp-validation-for="AssignedToUserId" class="text-danger"></span>
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">Save Customer</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

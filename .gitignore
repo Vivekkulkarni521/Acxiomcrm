@@ -1,0 +1,37 @@
+
+# Build output
+bin/
+obj/
+publish/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# VS Code local settings
+.vscode/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+
+# Logs
+*.log
+logs/
+
+# Database backups
+*.sql
+*.bak
+
+# Archives
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,8 @@
+@model ACXIOMCRM.Models.ViewModels.RolePermissionEditViewModel
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="Name" class="form-label">Role name</label><input asp-for="Name" class="form-control" readonly="@(Model.RoleId != null)" /><span asp-validation-for="Name" class="text-danger"></span></div>
+<input asp-for="RoleId" type="hidden" />
+<div class="table-responsive"><table class="table table-bordered align-middle"><thead><tr><th>Module</th>@foreach (var operation in ACXIOMCRM.Security.CrmPermissionCatalog.Operations) { <th class="text-center">@operation</th> }</tr></thead><tbody>
+@for (var row = 0; row < ACXIOMCRM.Security.CrmPermissionCatalog.Modules.Length; row++) { var module = ACXIOMCRM.Security.CrmPermissionCatalog.Modules[row]; <tr><th>@module</th>@for (var col = 0; col < ACXIOMCRM.Security.CrmPermissionCatalog.Operations.Length; col++) { var index = row * ACXIOMCRM.Security.CrmPermissionCatalog.Operations.Length + col; <td class="text-center"><input asp-for="Permissions[index].Granted" class="form-check-input" /><input asp-for="Permissions[index].Module" type="hidden" /><input asp-for="Permissions[index].Operation" type="hidden" /></td> }</tr> }
+</tbody></table></div>
+<button type="submit" class="btn btn-primary">Save Permissions</button> <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>

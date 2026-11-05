@@ -1,0 +1,9 @@
+@model ACXIOMCRM.Models.ViewModels.EditUserViewModel
+@{ ViewData["Title"] = "Manage User"; }
+<div class="container py-4"><div class="card shadow-sm border-0 mx-auto" style="max-width: 640px"><div class="card-header bg-primary text-white"><h2 class="h4 mb-0">Manage User</h2></div><div class="card-body">
+<form asp-action="Edit" method="post">@Html.AntiForgeryToken()<input asp-for="UserId" type="hidden" /><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="DisplayName" class="form-label"></label><input asp-for="DisplayName" class="form-control" readonly /></div><div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" readonly /></div>
+<div class="mb-3"><label asp-for="Role" class="form-label"></label><select asp-for="Role" asp-items="Model.Roles" class="form-select"></select><span asp-validation-for="Role" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="TeamId" class="form-label"></label><select asp-for="TeamId" asp-items="Model.Teams" class="form-select"><option value="">No team</option></select><span asp-validation-for="TeamId" class="text-danger"></span><div class="form-text">Managers can view records assigned to users in their team.</div></div>
+<div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label"></label></div>
+<button type="submit" class="btn btn-primary">Save Access</button> <a asp-action="Index" class="btn btn-secondary">Cancel</a></form></div></div></div>

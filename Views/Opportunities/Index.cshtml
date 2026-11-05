@@ -1,0 +1,73 @@
+@model ACXIOMCRM.Models.ViewModels.OpportunityListViewModel
+@using ACXIOMCRM.Models
+@{ ViewData["Title"] = "Opportunity Management"; var canCreate = await CrmPermissions.HasPermissionAsync(User, "Opportunities", "Create"); var canEdit = await CrmPermissions.HasPermissionAsync(User, "Opportunities", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Opportunities", "Delete"); }
+
+<style>
+    .pipeline-card { border: 0; border-radius: 12px; box-shadow: 0 3px 14px rgba(0,0,0,.06); height: 100%; }
+    .pipeline-value { font-size: 1.2rem; font-weight: 700; overflow-wrap: anywhere; }
+    .metric-card { border: 0; border-radius: 14px; box-shadow: 0 3px 14px rgba(0,0,0,.06); height: 100%; }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div><h2 class="fw-bold mb-1">Opportunity Management</h2><p class="text-muted mb-0">Track your sales pipeline and expected revenue.</p></div>
+        @if (canCreate) { <a asp-action="Create" class="btn btn-primary">+ Add Opportunity</a> }
+    </div>
+    @if (TempData["Success"] != null) { <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger alert-dismissible fade show">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4"><div class="card metric-card p-3"><div class="text-muted">Total Pipeline Value</div><div class="h3 mb-0">@Model.TotalPipelineValue.ToString("C")</div><small class="text-muted">All opportunity stages</small></div></div>
+        <div class="col-12 col-md-4"><div class="card metric-card p-3"><div class="text-muted">Won Revenue</div><div class="h3 mb-0 text-success">@Model.WonRevenue.ToString("C")</div><small class="text-muted">Won opportunities</small></div></div>
+        <div class="col-12 col-md-4"><div class="card metric-card p-3"><div class="text-muted">Open Opportunity Value</div><div class="h3 mb-0 text-primary">@Model.OpenOpportunityValue.ToString("C")</div><small class="text-muted">Qualification, Proposal, and Negotiation</small></div></div>
+    </div>
+
+    <h3 class="h5 fw-bold mb-3">Sales Pipeline by Stage</h3>
+    <div class="row g-3 mb-4">
+        @foreach (var summary in Model.StageSummaries)
+        {
+            var color = summary.Stage switch { OpportunityStage.Qualification => "primary", OpportunityStage.Proposal => "info", OpportunityStage.Negotiation => "warning", OpportunityStage.Won => "success", _ => "secondary" };
+            <div class="col-12 col-sm-6 col-lg">
+                <a asp-action="Index" asp-route-stage="@summary.Stage" asp-route-search="@Model.Search" class="text-decoration-none text-reset">
+                    <div class="card pipeline-card p-3 border-start border-4 border-@color">
+                        <div class="d-flex justify-content-between gap-2"><span class="fw-semibold">@summary.Stage</span><span class="badge bg-@color">@summary.Count</span></div>
+                        <div class="pipeline-value mt-2">@summary.Amount.ToString("C")</div>
+                        <small class="text-muted">Stage value</small>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    <form asp-action="Index" method="get" class="card card-body shadow-sm border-0 mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-7"><label for="search" class="form-label">Search opportunities</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Opportunity title, lead name, or company" /></div>
+            <div class="col-12 col-sm-7 col-md-3"><label for="stage" class="form-label">Stage</label><select id="stage" name="stage" class="form-select"><option value="">All stages</option>@foreach (var item in Enum.GetValues<OpportunityStage>()) { <option value="@item" selected="@(Model.Stage == item)">@item</option> }</select></div>
+            <div class="col-12 col-sm-5 col-md-2 d-flex gap-2"><button type="submit" class="btn btn-primary flex-grow-1">Apply</button><a asp-action="Index" class="btn btn-outline-secondary">Clear</a></div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm border-0"><div class="card-body table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark"><tr><th>Lead</th><th>Opportunity</th><th>Amount</th><th>Stage</th><th>Probability</th><th>Expected close</th><th>Actions</th></tr></thead>
+            <tbody>
+            @if (Model.Opportunities.Count == 0)
+            {
+                <tr><td colspan="7" class="text-center text-muted py-4">No opportunities match these filters.</td></tr>
+            }
+            else
+            {
+                @foreach (var opportunity in Model.Opportunities)
+                {
+                    <tr>
+                        <td>@opportunity.Lead?.Name@if (!string.IsNullOrWhiteSpace(opportunity.Lead?.Company)) { <small class="d-block text-muted">@opportunity.Lead.Company</small> }</td>
+                        <td>@opportunity.Title</td><td>@opportunity.Amount.ToString("C")</td>
+                        <td><span class="badge bg-info text-dark">@opportunity.Stage</span></td><td>@opportunity.Probability%</td><td>@opportunity.ExpectedCloseDate.ToString("dd MMM yyyy")</td>
+                        <td><div class="d-flex flex-wrap gap-1"><a asp-action="Details" asp-route-id="@opportunity.Id" class="btn btn-sm btn-info">View</a>@if (canEdit) { <a asp-action="Edit" asp-route-id="@opportunity.Id" class="btn btn-sm btn-warning">Edit</a> }@if (canDelete) { <a asp-action="Delete" asp-route-id="@opportunity.Id" class="btn btn-sm btn-danger">Delete</a> }</div></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>

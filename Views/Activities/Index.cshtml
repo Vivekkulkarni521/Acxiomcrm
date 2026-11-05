@@ -1,0 +1,48 @@
+@model ACXIOMCRM.Models.ViewModels.ActivityListViewModel
+@using ACXIOMCRM.Models
+@{ ViewData["Title"] = "Activity Management"; var canCreate = await CrmPermissions.HasPermissionAsync(User, "Activities", "Create"); var canEdit = await CrmPermissions.HasPermissionAsync(User, "Activities", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Activities", "Delete"); }
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4"><div><h2 class="fw-bold mb-1">Activity Management</h2><p class="text-muted mb-0">Track calls, meetings, emails, and tasks.</p></div>@if (canCreate) { <a asp-action="Create" class="btn btn-primary">+ Add Activity</a> }</div>
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    <form asp-action="Index" method="get" class="card card-body shadow-sm border-0 mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4"><label for="search" class="form-label">Search</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Subject, description, customer, lead, or opportunity" /></div>
+            <div class="col-12 col-sm-6 col-md-2"><label for="type" class="form-label">Type</label><select id="type" name="type" class="form-select"><option value="">All types</option>@foreach (var item in Enum.GetValues<ActivityType>()) { <option value="@item" selected="@(Model.Type == item)">@item</option> }</select></div>
+            <div class="col-12 col-sm-6 col-md-2"><label for="status" class="form-label">Status</label><select id="status" name="status" class="form-select"><option value="">All statuses</option>@foreach (var item in Enum.GetValues<ActivityStatus>()) { <option value="@item" selected="@(Model.Status == item)">@item</option> }</select></div>
+            <div class="col-6 col-md-1"><label for="dateFrom" class="form-label">From</label><input id="dateFrom" name="dateFrom" type="date" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+            <div class="col-6 col-md-1"><label for="dateTo" class="form-label">To</label><input id="dateTo" name="dateTo" type="date" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+            <div class="col-12 col-md-2 d-flex gap-2"><button type="submit" class="btn btn-primary flex-grow-1">Apply</button><a asp-action="Index" class="btn btn-outline-secondary">Clear</a></div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm border-0"><div class="card-body table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark"><tr><th>Type</th><th>Subject</th><th>Related to</th><th>Date and time</th><th>Status</th><th>Priority</th><th>Assigned employee</th><th>Actions</th></tr></thead>
+            <tbody>
+            @if (Model.Activities.Count == 0) { <tr><td colspan="8" class="text-center text-muted py-4">No activities match these filters.</td></tr> }
+            else
+            {
+                @foreach (var row in Model.Activities)
+                {
+                    var item = row.Activity;
+                    var statusColor = row.DisplayStatus switch { ActivityStatus.Completed => "success", ActivityStatus.Cancelled => "secondary", ActivityStatus.Overdue => "danger", _ => "primary" };
+                    var priorityColor = item.Priority switch { ActivityPriority.Urgent => "danger", ActivityPriority.High => "warning", ActivityPriority.Low => "secondary", _ => "info" };
+                    <tr>
+                        <td>@item.Type</td><td>@item.Subject</td>
+                        <td class="text-nowrap">
+                            @if (item.Customer != null) { <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId">@item.Customer.Name</a> }
+                            @if (item.Lead != null) { <a asp-controller="Leads" asp-action="Details" asp-route-id="@item.LeadId">@item.Lead.Name</a> }
+                            @if (item.Opportunity != null) { <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.OpportunityId">@item.Opportunity.Title</a> }
+                        </td>
+                        <td>@item.ScheduledAt.ToString("dd MMM yyyy, h:mm tt")</td><td><span class="badge bg-@statusColor">@row.DisplayStatus</span></td><td><span class="badge bg-@priorityColor">@item.Priority</span></td><td>@(item.AssignedToUser?.DisplayName ?? "—")</td>
+                        <td class="text-nowrap"><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">View</a>@if (canEdit) { <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> }@if (canDelete) { <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a> }</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>

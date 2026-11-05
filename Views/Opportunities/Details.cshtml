@@ -1,0 +1,24 @@
+@model ACXIOMCRM.Models.Opportunity
+@{ ViewData["Title"] = "Opportunity Details"; var canEdit = await CrmPermissions.HasPermissionAsync(User, "Opportunities", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Opportunities", "Delete"); }
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 800px">
+        <div class="card-header bg-info text-dark d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">Opportunity Details</h2>
+            <a asp-action="Index" class="btn btn-sm btn-light">Back to Pipeline</a>
+        </div>
+        <div class="card-body">
+            <h3 class="h5 mb-3">@Model.Title</h3>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Lead</dt><dd class="col-sm-8"><a asp-controller="Leads" asp-action="Details" asp-route-id="@Model.LeadId">@Model.Lead?.Name</a></dd>
+                <dt class="col-sm-4">Company</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Lead?.Company) ? "—" : Model.Lead.Company)</dd>
+                <dt class="col-sm-4">Amount</dt><dd class="col-sm-8">@Model.Amount.ToString("C")</dd>
+                <dt class="col-sm-4">Stage</dt><dd class="col-sm-8"><span class="badge bg-info text-dark">@Model.Stage</span></dd>
+                <dt class="col-sm-4">Probability</dt><dd class="col-sm-8">@Model.Probability%</dd>
+                <dt class="col-sm-4">Expected close</dt><dd class="col-sm-8">@Model.ExpectedCloseDate.ToString("dd MMM yyyy")</dd>
+                <dt class="col-sm-4">Created</dt><dd class="col-sm-8">@Model.CreatedAt.ToString("dd MMM yyyy, h:mm tt") UTC</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white">@if (canEdit) { <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Opportunity</a> }@if (canDelete) { <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger ms-1">Delete Opportunity</a> }</div>
+    </div>
+</div>

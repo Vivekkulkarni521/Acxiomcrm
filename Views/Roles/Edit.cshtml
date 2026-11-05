@@ -1,0 +1,3 @@
+@model ACXIOMCRM.Models.ViewModels.RolePermissionEditViewModel
+@{ ViewData["Title"] = "Role Permissions"; }
+<div class="container py-4"><h2>Edit @Model.Name Permissions</h2><p class="text-muted">Permissions are checked against the role on each request.</p><form asp-action="Edit" method="post">@Html.AntiForgeryToken()<partial name="_PermissionForm" model="Model" /></form></div>

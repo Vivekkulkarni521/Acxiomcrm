@@ -1,0 +1,29 @@
+@model ACXIOMCRM.Models.Customer
+@{ ViewData["Title"] = "Customer Details"; var canEdit = await CrmPermissions.HasPermissionAsync(User, "Customers", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Customers", "Delete"); }
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 850px">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">Customer Details</h2>
+            <a asp-action="Index" class="btn btn-sm btn-light">Back to Customers</a>
+        </div>
+        <div class="card-body">
+            <h3 class="h5 mb-3">@Model.Name</h3>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd>
+                <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">@Model.Phone</dd>
+                <dt class="col-sm-4">Company</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Company) ? "—" : Model.Company)</dd>
+                <dt class="col-sm-4">Address</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Address) ? "—" : Model.Address)</dd>
+                <dt class="col-sm-4">City</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.City) ? "—" : Model.City)</dd>
+                <dt class="col-sm-4">State</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.State) ? "—" : Model.State)</dd>
+                <dt class="col-sm-4">Country</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Country) ? "—" : Model.Country)</dd>
+                <dt class="col-sm-4">Assigned employee</dt><dd class="col-sm-8">@(Model.AssignedToUser?.DisplayName ?? "Unassigned")</dd>
+                <dt class="col-sm-4">Created date</dt><dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("g")</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white">
+            @if (canEdit) { <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Customer</a> }
+            @if (canDelete) { <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete Customer</a> }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+@model ACXIOMCRM.Models.ViewModels.ActivityDetailsViewModel
+@{ ViewData["Title"] = "Activity Details"; var item = Model.Activity; var canEdit = await CrmPermissions.HasPermissionAsync(User, "Activities", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Activities", "Delete"); }
+<div class="container py-4"><div class="card shadow-sm border-0 mx-auto" style="max-width: 850px">
+<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"><h2 class="h4 mb-0">Activity Details</h2><a asp-action="Index" class="btn btn-sm btn-light">Back to Activities</a></div>
+<div class="card-body"><h3 class="h5 mb-3">@item.Subject</h3><dl class="row mb-0">
+<dt class="col-sm-4">Type</dt><dd class="col-sm-8">@item.Type</dd>
+<dt class="col-sm-4">Description</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(item.Description) ? "—" : item.Description)</dd>
+<dt class="col-sm-4">Date and time</dt><dd class="col-sm-8">@item.ScheduledAt.ToString("f")</dd>
+<dt class="col-sm-4">Status</dt><dd class="col-sm-8">@Model.DisplayStatus</dd>
+<dt class="col-sm-4">Priority</dt><dd class="col-sm-8">@item.Priority</dd>
+<dt class="col-sm-4">Customer</dt><dd class="col-sm-8">@if (item.Customer != null) { <a asp-controller="Customers" asp-action="Details" asp-route-id="@item.CustomerId">@item.Customer.Name</a> } else { <span>—</span> }</dd>
+<dt class="col-sm-4">Lead</dt><dd class="col-sm-8">@if (item.Lead != null) { <a asp-controller="Leads" asp-action="Details" asp-route-id="@item.LeadId">@item.Lead.Name</a> } else { <span>—</span> }</dd>
+<dt class="col-sm-4">Opportunity</dt><dd class="col-sm-8">@if (item.Opportunity != null) { <a asp-controller="Opportunities" asp-action="Details" asp-route-id="@item.OpportunityId">@item.Opportunity.Title</a> } else { <span>—</span> }</dd>
+<dt class="col-sm-4">Assigned employee</dt><dd class="col-sm-8">@(item.AssignedToUser?.DisplayName ?? "—")</dd>
+<dt class="col-sm-4">Created</dt><dd class="col-sm-8">@item.CreatedAt.ToString("dd MMM yyyy, h:mm tt") UTC</dd>
+</dl></div><div class="card-footer bg-white">@if (canEdit) { <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit Activity</a> }@if (canDelete) { <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete Activity</a> }</div>
+</div></div>

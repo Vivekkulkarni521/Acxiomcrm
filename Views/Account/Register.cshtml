@@ -1,0 +1,11 @@
+@model ACXIOMCRM.Models.ViewModels.RegisterViewModel
+@{ ViewData["Title"] = "Register"; }
+<div class="container py-4"><div class="card shadow-sm border-0 mx-auto" style="max-width: 560px"><div class="card-header bg-primary text-white"><h2 class="h4 mb-0">Create an account</h2></div><div class="card-body">
+<form asp-action="Register" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" autocomplete="name" /><span asp-validation-for="Name" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" autocomplete="new-password" /><div class="form-text">Use at least 12 characters, including uppercase, lowercase, a number, and a symbol.</div><span asp-validation-for="Password" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+<button type="submit" class="btn btn-primary">Register</button> <a asp-action="Login" class="btn btn-secondary">Back to sign in</a></form>
+</div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

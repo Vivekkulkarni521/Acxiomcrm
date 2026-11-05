@@ -1,0 +1,41 @@
+
+@model ACXIOMCRM.Models.Lead
+
+@{
+    ViewData["Title"] = "Delete Lead";
+}
+
+<div class="container mt-5">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4>Confirm Delete Lead</h4>
+        </div>
+
+        <div class="card-body">
+            <h5>Are you sure you want to delete this lead?</h5>
+
+            <hr />
+
+            <p><strong>Name:</strong> @Model.Name</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Phone:</strong> @Model.Phone</p>
+            <p><strong>Company:</strong> @Model.Company</p>
+            <p><strong>Status:</strong> @Model.Status</p>
+
+            <form asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.Id"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-danger">
+                    Yes, Delete
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

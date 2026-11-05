@@ -1,0 +1,166 @@
+@model ACXIOMCRM.Models.ViewModels.DashboardViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Dashboard";
+    var leadLabelsJson = JsonSerializer.Serialize(Model.LeadStatusLabels);
+    var leadValuesJson = JsonSerializer.Serialize(Model.LeadStatusValues);
+    var opportunityLabelsJson = JsonSerializer.Serialize(Model.OpportunityStageLabels);
+    var opportunityValuesJson = JsonSerializer.Serialize(Model.OpportunityStageValues);
+}
+
+<style>
+    body { background: #f4f6fb; }
+    .dashboard-title { font-weight: 700; color: #172554; }
+    .stat-card, .chart-card {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 3px 15px rgba(0,0,0,.05);
+    }
+    .stat-card { transition: transform .2s; }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-number { font-size: clamp(1.5rem, 2vw, 1.9rem); font-weight: 700; overflow-wrap: anywhere; }
+    .stat-label { color: #64748b; font-size: 14px; }
+    .icon-box {
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+    }
+    .chart-wrap { position: relative; height: 280px; }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+        <div>
+            <h2 class="dashboard-title mb-1">CRM Dashboard</h2>
+            <p class="text-muted mb-0">Welcome to AcxiomCRM. Manage your business relationships.</p>
+        </div>
+        <div class="d-flex gap-2 align-self-start align-self-sm-center"><span class="badge bg-primary p-2">Dashboard</span><span class="badge bg-secondary p-2">Role: @Model.CurrentUserRole</span></div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Total Customers</div><div class="stat-number">@Model.TotalCustomers</div></div><div class="icon-box bg-primary-subtle fw-bold">C</div></div><small class="text-success mt-2">Customer records</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Total Leads</div><div class="stat-number">@Model.TotalLeads</div></div><div class="icon-box bg-success-subtle fw-bold">L</div></div><small class="text-success mt-2">Potential customers</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Open Opportunities</div><div class="stat-number">@Model.OpenOpportunities</div></div><div class="icon-box bg-warning-subtle fw-bold">O</div></div><small class="text-muted mt-2">Qualification, proposal, and negotiation</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Follow-ups</div><div class="stat-number">@Model.FollowUps</div></div><div class="icon-box bg-danger-subtle fw-bold">F</div></div><small class="text-muted mt-2">Scheduled activities</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Won Opportunities</div><div class="stat-number">@Model.WonOpportunities</div></div><div class="icon-box bg-success-subtle fw-bold">W</div></div><small class="text-success mt-2">Closed successfully</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Lost Opportunities</div><div class="stat-number">@Model.LostOpportunities</div></div><div class="icon-box bg-danger-subtle fw-bold">L</div></div><small class="text-muted mt-2">Closed as lost</small></div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card p-3 h-100"><div class="d-flex justify-content-between align-items-center gap-2"><div><div class="stat-label">Total Sales Pipeline Value</div><div class="stat-number">@Model.TotalSalesPipelineValue.ToString("C")</div></div><div class="icon-box bg-info-subtle fw-bold">$</div></div><small class="text-muted mt-2">Active opportunities only</small></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card chart-card p-3 h-100">
+                <h5>Lead Status Overview</h5>
+                <div class="chart-wrap"><canvas id="leadChart" role="img" aria-label="Lead counts by status"></canvas></div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card chart-card p-3 h-100">
+                <h5>Opportunity Pipeline</h5>
+                <div class="chart-wrap"><canvas id="opportunityChart" role="img" aria-label="Opportunity counts by stage"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card chart-card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Upcoming Activities</h5><a asp-controller="Activities" asp-action="Index" class="btn btn-sm btn-outline-primary">View all</a></div>
+                @if (Model.UpcomingActivities.Count == 0) { <p class="text-muted mb-0">No upcoming planned activities.</p> }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.UpcomingActivities)
+                        {
+                            var relatedName = item.Customer?.Name ?? item.Lead?.Name ?? item.Opportunity?.Title ?? "CRM record";
+                            <li class="list-group-item px-0 d-flex justify-content-between gap-3"><div><a asp-controller="Activities" asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">@item.Subject</a><small class="d-block text-muted">@item.Type · @relatedName</small></div><small class="text-nowrap">@item.ScheduledAt.ToString("dd MMM, h:mm tt")</small></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card chart-card p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Overdue Activities</h5><a asp-controller="Activities" asp-action="Index" asp-route-status="Overdue" class="btn btn-sm btn-outline-danger">View overdue</a></div>
+                @if (Model.OverdueActivities.Count == 0) { <p class="text-muted mb-0">No overdue planned activities.</p> }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.OverdueActivities)
+                        {
+                            var relatedName = item.Customer?.Name ?? item.Lead?.Name ?? item.Opportunity?.Title ?? "CRM record";
+                            <li class="list-group-item px-0 d-flex justify-content-between gap-3"><div><a asp-controller="Activities" asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none text-danger">@item.Subject</a><small class="d-block text-muted">@item.Type · @relatedName</small></div><small class="text-nowrap text-danger">@item.ScheduledAt.ToString("dd MMM, h:mm tt")</small></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="card chart-card p-3">
+        <h5>Quick Actions</h5>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Customers" asp-action="Create" class="btn btn-primary">+ Add Customer</a>
+            <a asp-controller="Leads" asp-action="Create" class="btn btn-success">+ Add Lead</a>
+            <a asp-controller="FollowUps" asp-action="Create" class="btn btn-warning">+ Schedule Follow-up</a>
+            <a asp-controller="Opportunities" asp-action="Index" class="btn btn-info">View Opportunities</a>
+            <a asp-controller="Activities" asp-action="Create" class="btn btn-secondary">+ Add Activity</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const leadLabels = @Html.Raw(leadLabelsJson);
+    const leadValues = @Html.Raw(leadValuesJson);
+    const opportunityLabels = @Html.Raw(opportunityLabelsJson);
+    const opportunityValues = @Html.Raw(opportunityValuesJson);
+
+    new Chart(document.getElementById('leadChart'), {
+        type: 'doughnut',
+        data: {
+            labels: leadLabels,
+            datasets: [{
+                data: leadValues,
+                backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('opportunityChart'), {
+        type: 'bar',
+        data: {
+            labels: opportunityLabels,
+            datasets: [{
+                label: 'Opportunities',
+                data: opportunityValues,
+                backgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>

@@ -1,0 +1,11 @@
+﻿@model ACXIOMCRM.Models.ViewModels.ManualAuditFormViewModel
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="row g-3">
+    <div class="col-md-8"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
+    <div class="col-md-4"><label asp-for="Department" class="form-label"></label><input asp-for="Department" class="form-control" /><span asp-validation-for="Department" class="text-danger"></span></div>
+    <div class="col-md-6"><label asp-for="AuditorUserId" class="form-label"></label><select asp-for="AuditorUserId" asp-items="Model.Auditors" class="form-select"><option value="">Select auditor</option></select><span asp-validation-for="AuditorUserId" class="text-danger"></span></div>
+    <div class="col-md-3"><label asp-for="AuditDate" class="form-label"></label><input asp-for="AuditDate" type="date" class="form-control" /><span asp-validation-for="AuditDate" class="text-danger"></span></div>
+    <div class="col-md-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<ACXIOMCRM.Models.ManualAuditStatus>()" class="form-select"></select><span asp-validation-for="Status" class="text-danger"></span></div>
+    <div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" rows="3" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <div class="col-12"><label asp-for="Findings" class="form-label"></label><textarea asp-for="Findings" rows="5" class="form-control"></textarea><span asp-validation-for="Findings" class="text-danger"></span></div>
+</div>

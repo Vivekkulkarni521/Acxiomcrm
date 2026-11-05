@@ -1,0 +1,3 @@
+@model ACXIOMCRM.Models.ViewModels.RolePermissionEditViewModel
+@{ ViewData["Title"] = "Create Role"; }
+<div class="container py-4"><h2>Create Role</h2><p class="text-muted">Choose permissions to grant to this role.</p><form asp-action="Create" method="post">@Html.AntiForgeryToken()<partial name="_PermissionForm" model="Model" /></form></div>

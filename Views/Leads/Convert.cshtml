@@ -1,0 +1,17 @@
+@model ACXIOMCRM.Models.Lead
+@{ ViewData["Title"] = "Convert Lead"; }
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 700px">
+        <div class="card-header bg-success text-white"><h2 class="h4 mb-0">Convert Lead to Customer</h2></div>
+        <div class="card-body">
+            <p>Convert <strong>@Model.Name</strong> into a customer? The name, email, phone, company, and assigned employee will be copied.</p>
+            <dl class="row"><dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd><dt class="col-sm-4">Company</dt><dd class="col-sm-8">@Model.Company</dd><dt class="col-sm-4">Assigned employee</dt><dd class="col-sm-8">@(Model.AssignedToUser?.DisplayName ?? "Unassigned")</dd></dl>
+            <form asp-action="ConvertConfirmed" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-success">Confirm Conversion</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

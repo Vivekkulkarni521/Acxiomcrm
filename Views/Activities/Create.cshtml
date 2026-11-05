@@ -1,0 +1,22 @@
+@model ACXIOMCRM.Models.CrmActivity
+@using ACXIOMCRM.Models
+@{ ViewData["Title"] = "Create Activity"; }
+<div class="container py-4"><div class="card shadow-sm border-0 mx-auto" style="max-width: 900px"><div class="card-header bg-primary text-white"><h2 class="h4 mb-0">Create Activity</h2></div><div class="card-body">
+<form asp-action="Create" method="post">@Html.AntiForgeryToken()<div asp-validation-summary="All" class="text-danger mb-3"></div>
+<div class="row g-3">
+<div class="col-md-6"><label asp-for="Type" class="form-label"></label><select asp-for="Type" asp-items="Html.GetEnumSelectList<ActivityType>()" class="form-select"></select><span asp-validation-for="Type" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="Subject" class="form-label"></label><input asp-for="Subject" class="form-control" maxlength="200" /><span asp-validation-for="Subject" class="text-danger"></span></div>
+<div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="3" maxlength="2000"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="ScheduledAt" class="form-label"></label><input asp-for="ScheduledAt" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" /><span asp-validation-for="ScheduledAt" class="text-danger"></span></div>
+<div class="col-md-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" asp-items="Html.GetEnumSelectList<ActivityStatus>()" class="form-select"></select><span asp-validation-for="Status" class="text-danger"></span></div>
+<div class="col-md-3"><label asp-for="Priority" class="form-label"></label><select asp-for="Priority" asp-items="Html.GetEnumSelectList<ActivityPriority>()" class="form-select"></select><span asp-validation-for="Priority" class="text-danger"></span></div>
+<div class="col-md-4"><label asp-for="CustomerId" class="form-label">Customer (optional)</label><select asp-for="CustomerId" asp-items="ViewBag.Customers" class="form-select"><option value="">—</option></select><span asp-validation-for="CustomerId" class="text-danger"></span></div>
+<div class="col-md-4"><label asp-for="LeadId" class="form-label">Lead (optional)</label><select asp-for="LeadId" asp-items="ViewBag.Leads" class="form-select"><option value="">—</option></select><span asp-validation-for="LeadId" class="text-danger"></span></div>
+<div class="col-md-4"><label asp-for="OpportunityId" class="form-label">Opportunity (optional)</label><select asp-for="OpportunityId" asp-items="ViewBag.Opportunities" class="form-select"><option value="">—</option></select><span asp-validation-for="OpportunityId" class="text-danger"></span></div>
+<div class="col-12"><div class="form-text">Link this activity to at least one customer, lead, or opportunity.</div></div>
+@if (User.IsInRole("Admin")) { <div class="col-md-6"><label asp-for="AssignedToUserId" class="form-label">Assigned employee</label><select asp-for="AssignedToUserId" asp-items="ViewBag.Employees" class="form-select"><option value="">Select an employee</option></select><span asp-validation-for="AssignedToUserId" class="text-danger"></span></div> }
+else { <input asp-for="AssignedToUserId" type="hidden" /><div class="col-md-6"><label class="form-label">Assigned employee</label><div class="form-control-plaintext">@ViewBag.AssignedEmployeeName</div></div> }
+</div>
+<div class="mt-4"><button type="submit" class="btn btn-primary">Save Activity</button> <a asp-action="Index" class="btn btn-secondary">Cancel</a></div>
+</form></div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

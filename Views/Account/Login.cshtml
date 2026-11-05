@@ -1,0 +1,11 @@
+@model ACXIOMCRM.Models.ViewModels.LoginViewModel
+@{ ViewData["Title"] = "Sign in"; }
+<div class="container py-5"><div class="card shadow-sm border-0 mx-auto" style="max-width: 480px"><div class="card-header bg-primary text-white"><h2 class="h4 mb-0">Sign in to ACXIOMCRM</h2></div><div class="card-body">
+<form asp-action="Login" method="post">@Html.AntiForgeryToken()<input asp-for="ReturnUrl" type="hidden" /><div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" autocomplete="username" /><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" autocomplete="current-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
+<div class="form-check mb-3"><input asp-for="RememberMe" class="form-check-input" /><label asp-for="RememberMe" class="form-check-label"></label></div>
+<button type="submit" class="btn btn-primary w-100">Sign in</button></form>
+<div class="text-center mt-3">New here? <a asp-action="Register">Create an account</a></div>
+</div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

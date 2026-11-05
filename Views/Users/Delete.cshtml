@@ -1,0 +1,7 @@
+@model ACXIOMCRM.Models.ViewModels.UserListItemViewModel
+@{ ViewData["Title"] = "Delete User"; }
+<div class="container py-4"><div class="card shadow-sm border-0 mx-auto" style="max-width: 700px"><div class="card-header bg-danger text-white"><h2 class="h4 mb-0">Delete User</h2></div><div class="card-body">
+<p>Delete this user account? Assigned customer and lead records will become unassigned. Activities assigned to this user will be transferred to your Admin account.</p>
+<dl class="row"><dt class="col-sm-4">Name</dt><dd class="col-sm-8">@Model.DisplayName</dd><dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd><dt class="col-sm-4">Role</dt><dd class="col-sm-8">@Model.Role</dd><dt class="col-sm-4">Team</dt><dd class="col-sm-8">@(Model.TeamName ?? "—")</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.IsActive ? "Active" : "Inactive")</dd></dl>
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">@Html.AntiForgeryToken()<button type="submit" class="btn btn-danger">Confirm Delete</button> <a asp-action="Index" class="btn btn-secondary">Cancel</a></form>
+</div></div></div>

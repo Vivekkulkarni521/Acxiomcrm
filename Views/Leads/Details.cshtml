@@ -1,0 +1,31 @@
+@model ACXIOMCRM.Models.Lead
+@{ ViewData["Title"] = "Lead Details"; var canEdit = await CrmPermissions.HasPermissionAsync(User, "Leads", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Leads", "Delete"); }
+
+<div class="container py-4">
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 850px">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"><h2 class="h4 mb-0">Lead Details</h2><a asp-action="Index" class="btn btn-sm btn-light">Back to Leads</a></div>
+        <div class="card-body">
+            <h3 class="h5 mb-3">@Model.Name</h3>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.Email</dd>
+                <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Phone) ? "—" : Model.Phone)</dd>
+                <dt class="col-sm-4">Company</dt><dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Company) ? "—" : Model.Company)</dd>
+                <dt class="col-sm-4">Source</dt><dd class="col-sm-8">@Model.Source</dd>
+                <dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="badge bg-info">@Model.Status</span></dd>
+                <dt class="col-sm-4">Assigned employee</dt><dd class="col-sm-8">@(Model.AssignedToUser?.DisplayName ?? "Unassigned")</dd>
+                <dt class="col-sm-4">Created date</dt><dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("g")</dd>
+                @if (Model.ConvertedCustomer != null)
+                {
+                    <dt class="col-sm-4">Converted customer</dt><dd class="col-sm-8"><a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.ConvertedCustomer.Id">@Model.ConvertedCustomer.Name</a></dd>
+                }
+            </dl>
+        </div>
+        <div class="card-footer bg-white d-flex flex-wrap gap-2">
+            @if (canEdit) { <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Lead</a> }
+            @if (canEdit && Model.Status == ACXIOMCRM.Models.LeadStatuses.Qualified && Model.ConvertedCustomer == null) { <a asp-action="Convert" asp-route-id="@Model.Id" class="btn btn-success">Convert to Customer</a> }
+            @if (canDelete) { <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete Lead</a> }
+        </div>
+    </div>
+</div>

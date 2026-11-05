@@ -1,0 +1,62 @@
+@model ACXIOMCRM.Models.ViewModels.LeadListViewModel
+@{ ViewData["Title"] = "Lead Management"; var canCreate = await CrmPermissions.HasPermissionAsync(User, "Leads", "Create"); var canEdit = await CrmPermissions.HasPermissionAsync(User, "Leads", "Edit"); var canDelete = await CrmPermissions.HasPermissionAsync(User, "Leads", "Delete"); }
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+        <div><h2 class="fw-bold mb-1">Lead Management</h2><p class="text-muted mb-0">Manage and track potential customers.</p></div>
+        @if (canCreate) { <a asp-action="Create" class="btn btn-primary">+ Add New Lead</a> }
+    </div>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    <form asp-action="Index" method="get" class="card card-body shadow-sm border-0 mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-7"><label for="search" class="form-label">Search leads</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Name, email, phone, or company" /></div>
+            <div class="col-12 col-sm-7 col-md-3"><label for="status" class="form-label">Status</label><select id="status" name="status" class="form-select"><option value="">All statuses</option>@foreach (var status in Model.StatusOptions) { <option value="@status" selected="@(status == Model.Status)">@status</option> }</select></div>
+            <div class="col-12 col-sm-5 col-md-2 d-flex gap-2"><button type="submit" class="btn btn-primary flex-grow-1">Apply</button><a asp-action="Index" class="btn btn-outline-secondary">Clear</a></div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm border-0"><div class="card-body table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark"><tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Source</th><th>Status</th><th>Assigned to</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody>
+            @if (Model.Leads.Count == 0)
+            {
+                <tr><td colspan="9" class="text-center text-muted py-4">No leads match these filters.</td></tr>
+            }
+            else
+            {
+                @foreach (var lead in Model.Leads)
+                {
+                    <tr>
+                        <td>@lead.Name</td><td>@lead.Email</td><td>@lead.Phone</td><td>@(string.IsNullOrWhiteSpace(lead.Company) ? "—" : lead.Company)</td><td>@lead.Source</td>
+                        <td>
+                            @if (lead.Status == ACXIOMCRM.Models.LeadStatuses.Converted)
+                            { <span class="badge bg-success">Converted</span> }
+                            else
+                            {
+                                @if (canEdit) { <form asp-action="UpdateStatus" method="post" class="d-flex gap-1">
+                                    @Html.AntiForgeryToken()<input type="hidden" name="id" value="@lead.Id" />
+                                    <select name="status" class="form-select form-select-sm" aria-label="Status for @lead.Name">
+                                        @foreach (var status in ACXIOMCRM.Models.LeadStatuses.Selectable) { <option value="@status" selected="@(status == lead.Status)">@status</option> }
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                </form> } else { <span class="badge bg-secondary">@lead.Status</span> }
+                            }
+                        </td>
+                        <td>@(lead.AssignedToUser?.DisplayName ?? "Unassigned")</td><td>@lead.CreatedAt.ToLocalTime().ToString("d")</td>
+                        <td class="text-nowrap">
+                            <a asp-action="Details" asp-route-id="@lead.Id" class="btn btn-sm btn-info">View</a>
+                            @if (canEdit) { <a asp-action="Edit" asp-route-id="@lead.Id" class="btn btn-sm btn-warning">Edit</a> }
+                            @if (canEdit && lead.Status == ACXIOMCRM.Models.LeadStatuses.Qualified) { <a asp-action="Convert" asp-route-id="@lead.Id" class="btn btn-sm btn-success">Convert</a> }
+                            @if (canDelete) { <a asp-action="Delete" asp-route-id="@lead.Id" class="btn btn-sm btn-danger">Delete</a> }
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div></div>
+</div>

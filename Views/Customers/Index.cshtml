@@ -1,0 +1,83 @@
+@model ACXIOMCRM.Models.ViewModels.CustomerListViewModel
+
+@{
+    ViewData["Title"] = "Customers";
+    var canCreate = await CrmPermissions.HasPermissionAsync(User, "Customers", "Create");
+    var canEdit = await CrmPermissions.HasPermissionAsync(User, "Customers", "Edit");
+    var canDelete = await CrmPermissions.HasPermissionAsync(User, "Customers", "Delete");
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+        <h2 class="mb-0">Customer Management</h2>
+        @if (canCreate) { <a asp-action="Create" class="btn btn-primary">+ Add Customer</a> }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form asp-action="Index" method="get" class="card card-body shadow-sm mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-lg-5">
+                <label for="search" class="form-label">Search customers</label>
+                <input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Name, email, phone, or company" />
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label for="company" class="form-label">Company</label>
+                <select id="company" name="company" class="form-select">
+                    <option value="">All companies</option>
+                    @foreach (var item in Model.Companies)
+                    {
+                        <option value="@item" selected="@(item == Model.Company)">@item</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-2">
+                <label for="assignedToUserId" class="form-label">Assigned employee</label>
+                <select id="assignedToUserId" name="assignedToUserId" asp-items="Model.Assignees" class="form-select">
+                    <option value="">All employees</option>
+                </select>
+            </div>
+            <div class="col-12 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Apply</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Assigned to</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                @if (Model.Customers.Count == 0)
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">No customers match these filters.</td></tr>
+                }
+                else
+                {
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <tr>
+                            <td>@customer.Name</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.Phone</td>
+                            <td>@(string.IsNullOrWhiteSpace(customer.Company) ? "—" : customer.Company)</td>
+                            <td>@(customer.AssignedToUser?.DisplayName ?? "Unassigned")</td>
+                            <td class="text-nowrap">
+                                <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-sm btn-info">View Details</a>
+                                @if (canEdit) { <a asp-action="Edit" asp-route-id="@customer.Id" class="btn btn-sm btn-warning">Edit</a> }
+                                @if (canDelete) { <a asp-action="Delete" asp-route-id="@customer.Id" class="btn btn-sm btn-danger">Delete</a> }
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

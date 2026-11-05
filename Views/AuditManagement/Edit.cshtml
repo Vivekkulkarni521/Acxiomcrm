@@ -1,0 +1,4 @@
+﻿@model ACXIOMCRM.Models.ViewModels.ManualAuditFormViewModel
+@{ ViewData["Title"] = "Edit Audit"; }
+<div class="container py-4"><div class="card shadow-sm border-0"><div class="card-header bg-white"><h2 class="h4 mb-0">Edit Audit</h2></div><div class="card-body"><form asp-action="Edit" asp-route-id="@Model.Id" method="post">@Html.AntiForgeryToken()<input asp-for="Id" type="hidden" /><partial name="_Form" model="Model" /><div class="mt-4 d-flex gap-2"><button class="btn btn-primary" type="submit">Save Changes</button><a asp-action="Index" class="btn btn-outline-secondary">Cancel</a></div></form></div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
